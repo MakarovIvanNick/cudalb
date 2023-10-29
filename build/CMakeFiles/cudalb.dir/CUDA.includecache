@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/oialpa/tprv/cudalb/kernel.cu
+cuda_runtime.h
+/home/oialpa/tprv/cudalb/cuda_runtime.h
+device_launch_parameters.h
+/home/oialpa/tprv/cudalb/device_launch_parameters.h
+stdio.h
+-
+stdlib.h
+-
+
