@@ -15,7 +15,7 @@ void getInfoCUDADevice(cudaDeviceProp& prop, int id) {
 	printf("CUDA device %i Maximum size of each dimension of a grid  - %i %i %i\n", id, prop.maxGridSize[0], prop.maxGridSize[1], prop.maxGridSize[2]);
 }
 
-__global__ void matrixMult(const int *A, const int *B, int *result, int size) {
+__global__ void matrixMult(const int64_t *A, const int64_t *B, int64_t *result, int size) {
 	//printf("blockIdx.y = %d,blockIdx.x = %d, threadIdx.y = %d, threadIdx.x = %d\n", blockIdx.y, blockIdx.x, threadIdx.y, threadIdx.x);
 	int bx = blockIdx.x;  
 	int by = blockIdx.y;
@@ -26,7 +26,7 @@ __global__ void matrixMult(const int *A, const int *B, int *result, int size) {
 	int ib = gridDim.x * bx + tx;
 	int ic = ia + ib;
 	
-	int sum = 0;
+	int64_t sum = 0;
 	
 	for (int k = 0; k < size; k++) {
 		sum += A[ia + k] * B[k * size + ib];
@@ -42,7 +42,7 @@ void printResultMatr(const int* matr, int size) {
 		printf("\n");
 	}
 }
-void compareMatrix(const int* f, const int* s, int size) {
+void compareMatrix(const int64_t* f, const int64_t* s, int size) {
 	for (int i = 0; i < size; ++i) {
 		for (int j = 0; j < size; ++j) {
 			if (f[i * size + j] != s[i * size + j]) {
@@ -61,7 +61,7 @@ int main()
 	cudaGetDeviceCount(&count);
 	//printf("Count CUDA devices - %i\n", count);
 	cudaGetDeviceProperties(&prop, count - 1);
-	// getInfoCUDADevice(prop, count - 1);
+	getInfoCUDADevice(prop, count - 1);
 
 	cudaEvent_t start, stop;
 	cudaEventCreate(&start);
@@ -70,11 +70,11 @@ int main()
 	for (int iter = 0; iter < 10; iter++) {
 		printf("ex num: %d\n", iter);
 		
-		size_t byte_size = size * size * sizeof(long);
-		int* h_A = (int*)malloc(byte_size);
-		int* h_B = (int*)malloc(byte_size);
-		int* h_C = (int*)malloc(byte_size);
-		int* CPU_C = (int*)malloc(byte_size);
+		size_t byte_size = size * size * sizeof(int64_t);
+		int64_t* h_A = (int64_t*)malloc(byte_size);
+		int64_t* h_B = (int64_t*)malloc(byte_size);
+		int64_t* h_C = (int64_t*)malloc(byte_size);
+		int64_t* CPU_C = (int64_t*)malloc(byte_size);
 
 		for (int i = 0; i < size * size; ++i) {
 			h_A[i] = rand() % 100;
@@ -105,15 +105,15 @@ int main()
 		//GPU (or device)
 		printf("GPU: \n");
 
-		int* d_A = NULL;
+		int64_t* d_A = NULL;
 		cudaMalloc((void**)&d_A, byte_size);
 		cudaMemcpy(d_A, h_A, byte_size, cudaMemcpyHostToDevice);
 
-		int* d_B = NULL;
+		int64_t* d_B = NULL;
 		cudaMalloc((void**)&d_B, byte_size);
 		cudaMemcpy(d_B, h_B, byte_size, cudaMemcpyHostToDevice);
 
-		int* d_C = NULL;
+		int64_t* d_C = NULL;
 		cudaMalloc((void**)&d_C, byte_size);
 
 		cudaEventRecord(start, 0);
